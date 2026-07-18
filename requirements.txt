@@ -1,0 +1,12 @@
+streamlit>=1.54.0
+pandas>=2.3.3
+numpy>=2.3.5
+plotly>=6.5.2
+sentence-transformers>=5.2.2
+faiss-cpu>=1.13.2
+vaderSentiment>=3.3.2
+openpyxl
+# Optional — enables live LLM generation instead of evidence-pack mode:
+# anthropic
+# openai
+# google-generativeai

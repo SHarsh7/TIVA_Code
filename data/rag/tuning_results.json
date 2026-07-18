@@ -1,0 +1,150 @@
+{
+  "grid": [
+    {
+      "config": "256tok/10%",
+      "chunk_words": 192,
+      "overlap": 0.1,
+      "metric": "cosine",
+      "n_chunks": 3397,
+      "index_build_s": 56.2,
+      "hit_rate_at5": 1.0,
+      "mrr_at10": 0.938,
+      "precision_at5": 0.783,
+      "mean_latency_ms": 16.4
+    },
+    {
+      "config": "256tok/10%",
+      "chunk_words": 192,
+      "overlap": 0.1,
+      "metric": "dot",
+      "n_chunks": 3397,
+      "index_build_s": 56.2,
+      "hit_rate_at5": 1.0,
+      "mrr_at10": 0.938,
+      "precision_at5": 0.783,
+      "mean_latency_ms": 20.8
+    },
+    {
+      "config": "256tok/20%",
+      "chunk_words": 192,
+      "overlap": 0.2,
+      "metric": "cosine",
+      "n_chunks": 3426,
+      "index_build_s": 60.3,
+      "hit_rate_at5": 1.0,
+      "mrr_at10": 1.0,
+      "precision_at5": 0.8,
+      "mean_latency_ms": 15.6
+    },
+    {
+      "config": "256tok/20%",
+      "chunk_words": 192,
+      "overlap": 0.2,
+      "metric": "dot",
+      "n_chunks": 3426,
+      "index_build_s": 60.3,
+      "hit_rate_at5": 1.0,
+      "mrr_at10": 1.0,
+      "precision_at5": 0.8,
+      "mean_latency_ms": 17.4
+    },
+    {
+      "config": "512tok/10%",
+      "chunk_words": 375,
+      "overlap": 0.1,
+      "metric": "cosine",
+      "n_chunks": 3113,
+      "index_build_s": 45.2,
+      "hit_rate_at5": 1.0,
+      "mrr_at10": 1.0,
+      "precision_at5": 0.817,
+      "mean_latency_ms": 15.2
+    },
+    {
+      "config": "512tok/10%",
+      "chunk_words": 375,
+      "overlap": 0.1,
+      "metric": "dot",
+      "n_chunks": 3113,
+      "index_build_s": 45.2,
+      "hit_rate_at5": 1.0,
+      "mrr_at10": 1.0,
+      "precision_at5": 0.817,
+      "mean_latency_ms": 15.5
+    },
+    {
+      "config": "512tok/20%",
+      "chunk_words": 375,
+      "overlap": 0.2,
+      "metric": "cosine",
+      "n_chunks": 3117,
+      "index_build_s": 45.6,
+      "hit_rate_at5": 1.0,
+      "mrr_at10": 1.0,
+      "precision_at5": 0.767,
+      "mean_latency_ms": 15.3
+    },
+    {
+      "config": "512tok/20%",
+      "chunk_words": 375,
+      "overlap": 0.2,
+      "metric": "dot",
+      "n_chunks": 3117,
+      "index_build_s": 45.6,
+      "hit_rate_at5": 1.0,
+      "mrr_at10": 1.0,
+      "precision_at5": 0.767,
+      "mean_latency_ms": 15.8
+    },
+    {
+      "config": "M4 baseline 500tok/15%",
+      "chunk_words": 375,
+      "overlap": 0.15,
+      "metric": "cosine",
+      "n_chunks": 3116,
+      "index_build_s": 45.1,
+      "hit_rate_at5": 1.0,
+      "mrr_at10": 1.0,
+      "precision_at5": 0.8,
+      "mean_latency_ms": 14.1
+    },
+    {
+      "config": "M4 baseline 500tok/15%",
+      "chunk_words": 375,
+      "overlap": 0.15,
+      "metric": "dot",
+      "n_chunks": 3116,
+      "index_build_s": 45.1,
+      "hit_rate_at5": 1.0,
+      "mrr_at10": 1.0,
+      "precision_at5": 0.8,
+      "mean_latency_ms": 14.8
+    }
+  ],
+  "best": {
+    "config": "512tok/10%",
+    "chunk_words": 375,
+    "overlap": 0.1,
+    "metric": "cosine",
+    "n_chunks": 3113,
+    "index_build_s": 45.2,
+    "hit_rate_at5": 1.0,
+    "mrr_at10": 1.0,
+    "precision_at5": 0.817,
+    "mean_latency_ms": 15.2
+  },
+  "gold_queries": [
+    "cost per km of electric buses versus diesel in India",
+    "FAME scheme subsidy for electric bus procurement",
+    "parents concerns about school bus safety and accidents",
+    "BMTC electric bus ride quality complaints",
+    "employee shuttle services like Cityflo and Shuttl for office commute",
+    "GD Goenka private electric school bus pilot in Delhi",
+    "JBM electric school bus safety features",
+    "corporate adoption of electric vehicles for employee transport",
+    "electric vehicle charging stations sitting idle in India",
+    "school bus fitness inspections and regulations",
+    "electric bus catching fire battery safety incident",
+    "Tata Starbus and Ultra electric bus features"
+  ]
+}

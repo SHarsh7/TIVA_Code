@@ -1,0 +1,14 @@
+[
+  {
+    "source": "datagov_vahan",
+    "error": "2 UUIDs found, none returned records"
+  },
+  {
+    "source": "datagov_srtu",
+    "error": "7 UUIDs found, none returned records"
+  },
+  {
+    "source": "wri",
+    "error": "HTTPSConnectionPool(host='datasets.wri.org', port=443): Max retries exceeded with url: /api/3/action/package_search?q=electric+school+bus&rows=5 (Caused by NameResolutionError(\"<urllib3.connection.HTTPSConnection object at 0x000001DC49856FD0>: Failed to resolve 'datasets.wri.org' ([Errno 11001] geta"
+  }
+]
