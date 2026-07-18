@@ -61,7 +61,18 @@ st.sidebar.caption(
     "Hybrid dense (MiniLM/FAISS) + sparse (BM25) retrieval, Reciprocal Rank Fusion, "
     "cross-encoder reranking, and a citation-locked, refusal-gated generation contract."
 )
-st.sidebar.caption("Set `ANTHROPIC_API_KEY` / `OPENAI_API_KEY` / `GEMINI_API_KEY` for live LLM answers — otherwise the app shows the retrieved evidence pack.")
+st.sidebar.caption("Set `GROQ_API_KEY` (free tier, model `llama-3.3-70b-versatile`) or `ANTHROPIC_API_KEY` / `OPENAI_API_KEY` / `GEMINI_API_KEY` for live LLM answers — otherwise the app shows the retrieved evidence pack.")
+
+_llm_badge = "🔴 Evidence-pack mode (no LLM key set)"
+if os.environ.get("GROQ_API_KEY"):
+    _llm_badge = f"🟢 Live generation via Groq ({os.environ.get('GROQ_MODEL', 'llama-3.3-70b-versatile')})"
+elif os.environ.get("ANTHROPIC_API_KEY"):
+    _llm_badge = "🟢 Live generation via Anthropic"
+elif os.environ.get("OPENAI_API_KEY"):
+    _llm_badge = "🟢 Live generation via OpenAI"
+elif os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY"):
+    _llm_badge = "🟢 Live generation via Gemini"
+st.sidebar.caption(_llm_badge)
 
 # ==================================================================
 # DATA LOADERS (cached)
@@ -171,7 +182,7 @@ if view == "📊 Dashboard":
         fig = go.Figure()
         fig.add_bar(y=comp.doc_type, x=comp.docs, orientation="h", marker_color=BLUE, name="documents")
         fig.update_layout(height=280, margin=dict(l=10, r=10, t=10, b=10),
-                           plot_bgcolor=SURFACE, paper_bgcolor=SURFACE,
+                           plot_bgcolor=SURFACE, paper_bgcolor=SURFACE, font=dict(color=INK, size=12),
                            xaxis_title="documents", showlegend=False)
         st.plotly_chart(fig, width='stretch')
 
@@ -182,7 +193,7 @@ if view == "📊 Dashboard":
         fig.add_bar(x=sal.voice, y=sal.Safety, name="Safety", marker_color=YELLOW)
         fig.add_bar(x=sal.voice, y=sal.Economics, name="Economics", marker_color=BLUE)
         fig.update_layout(height=280, margin=dict(l=10, r=10, t=10, b=10), barmode="group",
-                           plot_bgcolor=SURFACE, paper_bgcolor=SURFACE,
+                           plot_bgcolor=SURFACE, paper_bgcolor=SURFACE, font=dict(color=INK, size=12),
                            yaxis_title="mentions / 100 words", legend=dict(orientation="h", y=1.15))
         st.plotly_chart(fig, width='stretch')
 
@@ -196,7 +207,7 @@ if view == "📊 Dashboard":
         fig.add_bar(y=cats, x=[-split[c]["neg"] for c in cats], orientation="h", marker_color=RED, name="Negative %")
         fig.add_bar(y=cats, x=[split[c]["pos"] for c in cats], orientation="h", marker_color=BLUE, name="Positive %")
         fig.update_layout(height=260, margin=dict(l=10, r=10, t=10, b=10), barmode="overlay",
-                           plot_bgcolor=SURFACE, paper_bgcolor=SURFACE,
+                           plot_bgcolor=SURFACE, paper_bgcolor=SURFACE, font=dict(color=INK, size=12),
                            legend=dict(orientation="h", y=1.15))
         st.plotly_chart(fig, width='stretch')
         st.caption(f"Safety-related n={int(split['Safety-related']['n'])} · All other n={int(split['All other']['n'])}")
@@ -212,7 +223,7 @@ if view == "📊 Dashboard":
         fig.add_bar(x=labels, y=[base[m] for m in metrics], name="Baseline", marker_color=MUTED)
         fig.add_bar(x=labels, y=[best[m] for m in metrics], name="Tuned & promoted", marker_color=BLUE)
         fig.update_layout(height=260, margin=dict(l=10, r=10, t=10, b=10), barmode="group",
-                           plot_bgcolor=SURFACE, paper_bgcolor=SURFACE, yaxis_range=[0, 1.1],
+                           plot_bgcolor=SURFACE, paper_bgcolor=SURFACE, font=dict(color=INK, size=12), yaxis_range=[0, 1.1],
                            legend=dict(orientation="h", y=1.15))
         st.plotly_chart(fig, width='stretch')
 
@@ -224,7 +235,7 @@ if view == "📊 Dashboard":
     fig = go.Figure()
     fig.add_bar(x=ch.organization, y=ch.views, marker_color=AQUA)
     fig.update_layout(height=280, margin=dict(l=10, r=10, t=10, b=10),
-                       plot_bgcolor=SURFACE, paper_bgcolor=SURFACE, yaxis_title="cumulative views")
+                       plot_bgcolor=SURFACE, paper_bgcolor=SURFACE, font=dict(color=INK, size=12), yaxis_title="cumulative views")
     st.plotly_chart(fig, width='stretch')
 
     st.info("💡 Full write-up, TCO analysis, and strategic recommendations are in **Strategic_Business_Report.docx**.")

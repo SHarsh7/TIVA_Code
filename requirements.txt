@@ -6,6 +6,7 @@ sentence-transformers>=5.2.2
 faiss-cpu>=1.13.2
 vaderSentiment>=3.3.2
 openpyxl
+groq>=0.15.0
 # Optional — enables live LLM generation instead of evidence-pack mode:
 # anthropic
 # openai

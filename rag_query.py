@@ -102,6 +102,14 @@ def llm_generate(system, user):
         genai.configure(api_key=os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY"))
         return genai.GenerativeModel("gemini-1.5-flash",
                                      system_instruction=system).generate_content(user).text
+    if os.environ.get("GROQ_API_KEY"):
+        from groq import Groq
+        model_name = os.environ.get("GROQ_MODEL", "llama-3.3-70b-versatile")
+        r = Groq().chat.completions.create(
+            model=model_name, max_tokens=900, temperature=0.2,
+            messages=[{"role": "system", "content": system},
+                      {"role": "user", "content": user}])
+        return r.choices[0].message.content
     return None
 
 
