@@ -136,16 +136,34 @@ def get_stack():
     from rag_query import load_stack
     return load_stack()
 
+# A friendlier prompt than the CLI's — this app is a public-facing showcase,
+# not the strategy-analyst tool the milestone notebook/CLI targets.
+SIMPLE_SYSTEM_PROMPT = """You explain India's electric school-bus and office-shuttle market to someone
+with no background in the topic — a curious visitor, not a business analyst.
+
+RULES
+1. Use ONLY the facts in CONTEXT below. Never add outside knowledge, however confident.
+2. Write like you're talking to a friend: short sentences, everyday words, no jargon,
+   no business-speak, no citation tags like [chunk_id] inside the text.
+3. When you refer to where something came from, say it naturally — "some parents online said…",
+   "one report found…", "a news article mentioned…" — never a chunk ID or file name.
+4. Keep it short: 3-6 sentences, unless the question really needs more.
+5. If CONTEXT does not contain the answer, reply exactly: """ + \
+    "I couldn't find enough information about that in our data. Try asking about EV bus safety, cost, charging, or policy in India."
+
+FRIENDLY_REFUSAL = ("I couldn't find enough information about that in our data. "
+                     "Try asking about EV bus safety, cost, charging, or policy in India.")
+
 def run_query(query, k=5):
-    from rag_query import retrieve, build_context_pack, llm_generate, SYSTEM_PROMPT, REFUSAL_GATE, REFUSAL_TEXT
+    from rag_query import retrieve, build_context_pack, llm_generate, REFUSAL_GATE
     index, chunks_df, bm25, model, reranker = get_stack()
     hits = retrieve(query, index, chunks_df, bm25, model, reranker, k=k)
     dense_max = float(hits.dense_max.iloc[0])
     if dense_max < REFUSAL_GATE:
-        return {"refused": True, "dense_max": dense_max, "hits": hits, "answer": REFUSAL_TEXT}
+        return {"refused": True, "dense_max": dense_max, "hits": hits, "answer": FRIENDLY_REFUSAL}
     ctx = build_context_pack(hits)
     prompt = f"CONTEXT:\n{ctx}\n\nQUESTION: {query}"
-    answer = llm_generate(SYSTEM_PROMPT, prompt)
+    answer = llm_generate(SIMPLE_SYSTEM_PROMPT, prompt)
     live = answer is not None
     if not live:
         answer = ("_No LLM API key configured — showing the retrieved, reranked evidence pack "
@@ -281,15 +299,14 @@ else:
             with st.spinner("Retrieving evidence and generating…"):
                 result = run_query(query)
             if result["refused"]:
-                st.warning(f"🚫 **Insufficient evidence in corpus.** (max dense score {result['dense_max']:.3f} < 0.35 refusal gate)")
-                st.session_state.chat.append({"role": "assistant", "content":
-                    f"🚫 Insufficient evidence in corpus. (max dense score {result['dense_max']:.3f} < 0.35)"})
+                st.warning(f"🚫 {result['answer']}")
+                st.session_state.chat.append({"role": "assistant", "content": f"🚫 {result['answer']}"})
             else:
                 st.markdown(result["answer"])
                 hits = result["hits"]
                 src_list = [f"{h.chunk_id} · {h.source_name}" for _, h in hits.iterrows()]
-                with st.expander(f"📎 Top {len(hits)} evidence sources (reranked)"):
+                with st.expander(f"📎 See where this answer came from ({len(hits)} sources)"):
                     for _, h in hits.iterrows():
-                        st.markdown(f"**[{h.chunk_id}]** {h.source_name} — *{h.voice}*")
+                        st.markdown(f"**{h.source_name}** — *{h.voice.replace('_', ' ')}*")
                         st.caption(h.text[:280] + ("…" if len(h.text) > 280 else ""))
                 st.session_state.chat.append({"role": "assistant", "content": result["answer"], "sources": src_list})
