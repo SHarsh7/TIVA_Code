@@ -83,17 +83,25 @@ def build_context_pack(hits):
     return "\n\n---\n\n".join(blocks)
 
 
-def llm_generate(system, user):
+def llm_generate(system, user, max_tokens=1024, temperature=0.3):
+    if os.environ.get("GROQ_API_KEY"):
+        from groq import Groq
+        model_name = os.environ.get("GROQ_MODEL", "llama-3.3-70b-versatile")
+        r = Groq().chat.completions.create(
+            model=model_name, max_tokens=max_tokens, temperature=temperature,
+            messages=[{"role": "system", "content": system},
+                      {"role": "user", "content": user}])
+        return r.choices[0].message.content
     if os.environ.get("ANTHROPIC_API_KEY"):
         import anthropic
         r = anthropic.Anthropic().messages.create(
-            model="claude-sonnet-5", max_tokens=900, system=system,
+            model="claude-sonnet-5", max_tokens=max_tokens, system=system,
             messages=[{"role": "user", "content": user}])
         return r.content[0].text
     if os.environ.get("OPENAI_API_KEY"):
         import openai
         r = openai.OpenAI().chat.completions.create(
-            model="gpt-4o-mini", max_tokens=900,
+            model="gpt-4o-mini", max_tokens=max_tokens,
             messages=[{"role": "system", "content": system},
                       {"role": "user", "content": user}])
         return r.choices[0].message.content
@@ -102,14 +110,57 @@ def llm_generate(system, user):
         genai.configure(api_key=os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY"))
         return genai.GenerativeModel("gemini-1.5-flash",
                                      system_instruction=system).generate_content(user).text
+    return None
+
+
+def llm_generate_stream(system, user, max_tokens=1024, temperature=0.3):
+    """Like llm_generate, but returns a generator that yields the answer
+    incrementally (for st.write_stream). Returns None if no API key is set."""
     if os.environ.get("GROQ_API_KEY"):
         from groq import Groq
         model_name = os.environ.get("GROQ_MODEL", "llama-3.3-70b-versatile")
-        r = Groq().chat.completions.create(
-            model=model_name, max_tokens=900, temperature=0.2,
+        stream = Groq().chat.completions.create(
+            model=model_name, max_tokens=max_tokens, temperature=temperature, stream=True,
             messages=[{"role": "system", "content": system},
                       {"role": "user", "content": user}])
-        return r.choices[0].message.content
+        def gen():
+            for chunk in stream:
+                delta = chunk.choices[0].delta.content
+                if delta:
+                    yield delta
+        return gen()
+    if os.environ.get("ANTHROPIC_API_KEY"):
+        import anthropic
+        client = anthropic.Anthropic()
+        def gen():
+            with client.messages.stream(
+                    model="claude-sonnet-5", max_tokens=max_tokens, system=system,
+                    messages=[{"role": "user", "content": user}]) as s:
+                for text in s.text_stream:
+                    yield text
+        return gen()
+    if os.environ.get("OPENAI_API_KEY"):
+        import openai
+        stream = openai.OpenAI().chat.completions.create(
+            model="gpt-4o-mini", max_tokens=max_tokens, stream=True,
+            messages=[{"role": "system", "content": system},
+                      {"role": "user", "content": user}])
+        def gen():
+            for chunk in stream:
+                delta = chunk.choices[0].delta.content if chunk.choices else None
+                if delta:
+                    yield delta
+        return gen()
+    if os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY"):
+        import google.generativeai as genai
+        genai.configure(api_key=os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY"))
+        resp = genai.GenerativeModel("gemini-1.5-flash",
+                                     system_instruction=system).generate_content(user, stream=True)
+        def gen():
+            for chunk in resp:
+                if chunk.text:
+                    yield chunk.text
+        return gen()
     return None
 
 
